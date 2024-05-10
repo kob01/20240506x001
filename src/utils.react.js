@@ -97,7 +97,8 @@ const useEffect = (effect, dependence) => {
 
   renderQueueCurrent.hooks[renderQueueHookIndex] = renderQueueCurrentFind
 
-  if (renderQueueCurrentFind.dependence === undefined || renderQueueCurrentFind.dependence.some((i, index) => i !== dependence[index])) effect()
+  if (renderQueueCurrentFind.dependence === undefined || renderQueueCurrentFind.dependence.some((i, index) => i !== dependence[index])) renderQueueCurrentFind.effectPrevious = renderQueueCurrentFind.effectPrevious ? renderQueueCurrentFind.effectPrevious() : undefined
+  if (renderQueueCurrentFind.dependence === undefined || renderQueueCurrentFind.dependence.some((i, index) => i !== dependence[index])) renderQueueCurrentFind.effectPrevious = effect()
 
   renderQueueCurrentFind.dependence = dependence
 }

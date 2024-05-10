@@ -8,6 +8,7 @@ function App() {
   const scene = React.useMemo(() => new THREE.Scene(), [])
   const camera = React.useMemo(() => new THREE.PerspectiveCamera(), [])
   const renderer = React.useMemo(() => new THREE.WebGLRenderer({ antialias: true }), [])
+  const raycaster = React.useMemo(() => new THREE.Raycaster(), [])
 
   React.useEffect(() => {
     camera.position.z = 10
@@ -25,7 +26,7 @@ function App() {
     window.addEventListener('resize', resize)
   }, [])
 
-  React.contextProvider({ scene: scene, camera: camera, renderer: renderer })
+  React.contextProvider({ scene: scene, camera: camera, renderer: renderer, raycaster: raycaster })
 
   Example()
 
