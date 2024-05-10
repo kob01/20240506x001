@@ -8,7 +8,7 @@ const CopyWebpackPlugin = require("copy-webpack-plugin")
 const config = Object.assign({}, common, {
   mode: 'production',
   output: {
-    filename: 'game.js',
+    filename: 'index.js',
     path: path.resolve(__dirname, '../build')
   },
   plugins: [
@@ -29,8 +29,8 @@ if (process.argv.includes('--wx')) {
   config.plugins.push(
     new CopyWebpackPlugin({
       patterns: [
-        { from: path.join(__dirname, '../static/wx-config/game.json'), to: config.output.path + '/game.json' },
-        { from: path.join(__dirname, '../static/wx-config/project.config.json'), to: config.output.path + '/project.config.json' }
+        { from: path.join(__dirname, './game.json'), to: config.output.path + '/game.json' },
+        { from: path.join(__dirname, './project.config.json'), to: config.output.path + '/project.config.json' }
       ]
     })
   )

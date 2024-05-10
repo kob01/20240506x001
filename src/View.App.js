@@ -2,7 +2,7 @@ import * as THREE from 'three'
 
 import React from './utils.react'
 
-import Battle from './View.Page.Battle'
+import Example from './View.Page.Example'
 
 function App() {
   const scene = React.useMemo(() => new THREE.Scene(), [])
@@ -10,7 +10,7 @@ function App() {
   const renderer = React.useMemo(() => new THREE.WebGLRenderer({ antialias: true }), [])
 
   React.useEffect(() => {
-    camera.position.z = 5
+    camera.position.z = 10
 
     document.body.appendChild(renderer.domElement)
 
@@ -27,7 +27,7 @@ function App() {
 
   React.contextProvider({ scene: scene, camera: camera, renderer: renderer })
 
-  Battle()
+  Example()
 
   renderer.render(scene, camera)
 }

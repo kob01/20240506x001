@@ -7,7 +7,7 @@ var renderQueueCurrent = undefined
 var renderQueueHookIndex = undefined
 
 const component = (alternate) => {
-  return () => {
+  return (...props) => {
     var renderQueueFind
     var renderQueueFindIndex
 
@@ -28,7 +28,7 @@ const component = (alternate) => {
 
     contextQueueRecordCount.push(0)
 
-    alternate()
+    alternate(...props)
 
     contextQueue = contextQueue.filter((i, index) => index < contextQueue.length - contextQueueRecordCount[contextQueueRecordCount.length - 1])
     contextQueueRecordCount = contextQueueRecordCount.filter((i, index) => index < contextQueueRecordCount.length - 1)
