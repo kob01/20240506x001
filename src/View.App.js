@@ -3,7 +3,6 @@ import * as THREE from 'three'
 import React from './utils.react'
 
 import Example from './View.Page.Example'
-import Coordinate from './View.Component.Coordinate'
 
 function App() {
   const scene = React.useMemo(() => new THREE.Scene(), [])
@@ -14,9 +13,6 @@ function App() {
   const context = { scene: scene, camera: camera, renderer: renderer, raycaster: raycaster }
 
   React.useEffect(() => {
-    camera.position.set(10, 10, 10)
-    camera.lookAt(new THREE.Vector3(0, 0, 0))
-
     document.body.appendChild(renderer.domElement)
 
     const resize = () => {
@@ -30,10 +26,7 @@ function App() {
     window.addEventListener('resize', resize)
   }, [])
 
-
   React.contextProvider(context)
-
-  Coordinate({ lengthX: 10, lengthY: 10, lengthZ: 10, ...context })
 
   Example()
 

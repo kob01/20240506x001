@@ -3,9 +3,7 @@ import * as THREE from 'three'
 import React from './utils.react'
 
 const render = (props) => {
-  const geometry = React.useMemo(() => new THREE.BoxGeometry(...props.size), [])
-  const material = React.useMemo(() => new THREE.MeshBasicMaterial({ color: 0x449999 }), [])
-  const cube = React.useMemo(() => new THREE.Mesh(geometry, material), [])
+  const cube = React.useMemo(() => new THREE.Mesh(new THREE.BoxGeometry(...props.size), new THREE.MeshBasicMaterial({ color: 0x449999 })), [])
 
   const [x, setX] = React.useState(0)
   const [y, setY] = React.useState(0)
