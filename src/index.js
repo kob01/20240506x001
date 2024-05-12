@@ -4,9 +4,7 @@ import React from './utils.react'
 
 import App from './View.App'
 
-const id = '*'
-
-const style = document.getElementById(id) || document.createElement('style')
+const style = document.createElement('style')
 
 const styleString =
   [
@@ -16,10 +14,7 @@ const styleString =
   ]
     .join(' ')
 
-style.id = id
 style.innerHTML = styleString
-
-if (style.parentNode) style.parentNode.removeChild(style)
 
 document.head.appendChild(style)
 

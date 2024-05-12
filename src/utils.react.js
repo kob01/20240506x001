@@ -1,59 +1,88 @@
 var contextQueue = []
 var contextQueueRecordCount = []
 
-var renderQueuePreviousAnimation = []
-var renderQueueNextAnimation = []
-var renderQueueCurrent = undefined
-var renderQueueHookIndex = undefined
+var renderQueue = { alternate: 'root', children: [] }
+
+var renderQueueNode = undefined
+var renderQueueNodeChildrenIndex = 0
+
+var renderQueueHooks = []
+var renderQueueHook = undefined
+
+const destory = (node) => {
+  node.hooks.filter(i => i.type === useEffect && i.effectPrevious && typeof i.effectPrevious === 'function').forEach(i => i.effectPrevious())
+  node.children.forEach(i => destory(i))
+}
 
 const component = (alternate) => {
-  return (...props) => {
-    var renderQueueFind
-    var renderQueueFindIndex
+  return (props) => {
+    var node
+    var key = Object(props).key
+    var equalIndex = renderQueueNode.children.findIndex(i => i.key !== undefined && i.key === key && i.alternate === alternate)
 
-    if (renderQueueFind === undefined) {
-      renderQueueFindIndex = renderQueuePreviousAnimation.findIndex(i => i.alternate === alternate)
-      renderQueueFind = renderQueuePreviousAnimation[renderQueueFindIndex]
-      renderQueuePreviousAnimation = renderQueuePreviousAnimation.filter((i, index) => index > renderQueueFindIndex)
+    if (equalIndex !== -1) {
+      renderQueueNode.children.splice(renderQueueNodeChildrenIndex, 0, renderQueueNode.children.splice(equalIndex, 1)[0])
     }
 
-    if (renderQueueFind === undefined) {
-      renderQueueFind = { alternate: alternate, hooks: [] }
+    if (node === undefined && renderQueueNode.children[renderQueueNodeChildrenIndex] && renderQueueNode.children[renderQueueNodeChildrenIndex].alternate === alternate && renderQueueNode.children[renderQueueNodeChildrenIndex].key === key) {
+      node = renderQueueNode.children[renderQueueNodeChildrenIndex]
     }
 
-    renderQueueNextAnimation.push(renderQueueFind)
+    if (node === undefined) {
+      node = { key: key, alternate: alternate, children: [], hooks: [] }
+    }
 
-    renderQueueCurrent = renderQueueFind
-    renderQueueHookIndex = 0
+    if (node !== renderQueueNode.children[renderQueueNodeChildrenIndex] && renderQueueNode.children[renderQueueNodeChildrenIndex]) {
+      destory(renderQueueNode.children[renderQueueNodeChildrenIndex])
+    }
+
+    node.parent = renderQueueNode
+
+    renderQueueNode.children[renderQueueNodeChildrenIndex] = node
+
+    renderQueueNode = node
+    renderQueueNodeChildrenIndex = 0
 
     contextQueueRecordCount.push(0)
 
-    alternate(...props)
+    renderQueueHooks.push({ hooks: node.hooks, index: 0 })
+    renderQueueHook = renderQueueHooks[renderQueueHooks.length - 1]
+
+    node.alternate(props)
+
+    node.children.filter((i, index) => index > renderQueueNodeChildrenIndex || index === renderQueueNodeChildrenIndex).forEach(i => destory(i))
+    node.children = node.children.filter((i, index) => index < renderQueueNodeChildrenIndex)
+
+    renderQueueNode = node.parent
+    renderQueueNodeChildrenIndex = renderQueueNode.children.findIndex(i => i === node) + 1
 
     contextQueue = contextQueue.filter((i, index) => index < contextQueue.length - contextQueueRecordCount[contextQueueRecordCount.length - 1])
     contextQueueRecordCount = contextQueueRecordCount.filter((i, index) => index < contextQueueRecordCount.length - 1)
+
+    renderQueueHooks = renderQueueHooks.filter((i, index) => index < renderQueueHooks.length - 1)
+    renderQueueHook = renderQueueHooks[renderQueueHooks.length - 1]
   }
 }
 
 const render = (component) => {
-  component()
+  renderQueueNode = renderQueue
+  renderQueueNodeChildrenIndex = 0
 
-  renderQueuePreviousAnimation = renderQueueNextAnimation
-  renderQueueNextAnimation = []
+  component()
 
   requestAnimationFrame(() => render(component))
 }
 
-const hookProxy = (callback) => {
+const hook = (callback) => {
   return (...props) => {
     try {
-      if (renderQueueCurrent.hooks[renderQueueHookIndex] !== undefined && renderQueueCurrent.hooks[renderQueueHookIndex]._type !== callback) {
+      if (renderQueueHook.hooks[renderQueueHook.index] !== undefined && renderQueueHook.hooks[renderQueueHook.index].type !== callback) {
         throw Error(callback)
       }
       return callback(...props)
     } finally {
-      renderQueueCurrent.hooks[renderQueueHookIndex]._type = callback
-      renderQueueHookIndex = renderQueueHookIndex + 1
+      renderQueueHook.hooks[renderQueueHook.index].type = callback
+      renderQueueHook.index = renderQueueHook.index + 1
     }
   }
 }
@@ -68,58 +97,58 @@ const useContext = () => {
 }
 
 const useState = (state) => {
-  var renderQueueCurrentFind
+  var hook
 
-  if (renderQueueCurrentFind === undefined) renderQueueCurrentFind = renderQueueCurrent.hooks[renderQueueHookIndex]
-  if (renderQueueCurrentFind === undefined) renderQueueCurrentFind = { state: state }
+  if (hook === undefined) hook = renderQueueHook.hooks[renderQueueHook.index]
+  if (hook === undefined) hook = { state: state }
 
-  renderQueueCurrent.hooks[renderQueueHookIndex] = renderQueueCurrentFind
+  renderQueueHook.hooks[renderQueueHook.index] = hook
 
-  return [renderQueueCurrentFind.state, (state) => renderQueueCurrentFind.state = state]
+  return [hook.state, (state) => hook.state = state]
 }
 
 const useRef = (current) => {
-  var renderQueueCurrentFind
+  var hook
 
-  if (renderQueueCurrentFind === undefined) renderQueueCurrentFind = renderQueueCurrent.hooks[renderQueueHookIndex]
-  if (renderQueueCurrentFind === undefined) renderQueueCurrentFind = { current: current }
+  if (hook === undefined) hook = renderQueueHook.hooks[renderQueueHook.index]
+  if (hook === undefined) hook = { current: current }
 
-  renderQueueCurrent.hooks[renderQueueHookIndex] = renderQueueCurrentFind
+  renderQueueHook.hooks[renderQueueHook.index] = hook
 
-  return renderQueueCurrentFind
+  return renderQueueHook
 }
 
 const useEffect = (effect, dependence) => {
-  var renderQueueCurrentFind
+  var hook
 
-  if (renderQueueCurrentFind === undefined) renderQueueCurrentFind = renderQueueCurrent.hooks[renderQueueHookIndex]
-  if (renderQueueCurrentFind === undefined) renderQueueCurrentFind = { effect: effect }
+  if (hook === undefined) hook = renderQueueHook.hooks[renderQueueHook.index]
+  if (hook === undefined) hook = { effect: effect }
 
-  renderQueueCurrent.hooks[renderQueueHookIndex] = renderQueueCurrentFind
+  renderQueueHook.hooks[renderQueueHook.index] = hook
 
-  if (renderQueueCurrentFind.dependence === undefined || renderQueueCurrentFind.dependence.some((i, index) => i !== dependence[index])) renderQueueCurrentFind.effectPrevious = renderQueueCurrentFind.effectPrevious ? renderQueueCurrentFind.effectPrevious() : undefined
-  if (renderQueueCurrentFind.dependence === undefined || renderQueueCurrentFind.dependence.some((i, index) => i !== dependence[index])) renderQueueCurrentFind.effectPrevious = effect()
+  if (hook.dependence === undefined || hook.dependence.some((i, index) => i !== dependence[index])) hook.effectPrevious = hook.effectPrevious && typeof hook.effectPrevious === 'function' ? hook.effectPrevious() : undefined
+  if (hook.dependence === undefined || hook.dependence.some((i, index) => i !== dependence[index])) hook.effectPrevious = effect()
 
-  renderQueueCurrentFind.dependence = dependence
+  hook.dependence = dependence
 }
 
 const useMemo = (memo, dependence) => {
-  var renderQueueCurrentFind
+  var hook
 
-  if (renderQueueCurrentFind === undefined) renderQueueCurrentFind = renderQueueCurrent.hooks[renderQueueHookIndex]
-  if (renderQueueCurrentFind === undefined) renderQueueCurrentFind = { memo: memo }
+  if (hook === undefined) hook = renderQueueHook.hooks[renderQueueHook.index]
+  if (hook === undefined) hook = { memo: memo }
 
-  renderQueueCurrent.hooks[renderQueueHookIndex] = renderQueueCurrentFind
+  renderQueueHook.hooks[renderQueueHook.index] = hook
 
-  if (renderQueueCurrentFind.dependence === undefined || renderQueueCurrentFind.dependence.some((i, index) => i !== dependence[index])) renderQueueCurrentFind.state = memo()
+  if (hook.dependence === undefined || hook.dependence.some((i, index) => i !== dependence[index])) hook.state = memo()
 
-  renderQueueCurrentFind.dependence = dependence
+  hook.dependence = dependence
 
-  return renderQueueCurrentFind.state
+  return hook.state
 }
 
-const React = { render: render, component: component, contextProvider: contextProvider, useContext: useContext, useState, useRef, useEffect, useMemo }
+const React = { render, component, contextProvider, useContext, useState, useRef, useEffect, useMemo }
 
-Object.keys(React).filter(i => [useState, useRef, useEffect, useMemo].includes(React[i])).forEach(i => React[i] = hookProxy(React[i]))
+Object.keys(React).filter(i => [useState, useRef, useEffect, useMemo].includes(React[i])).forEach(i => React[i] = hook(React[i]))
 
 export default React

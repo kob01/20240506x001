@@ -36,6 +36,7 @@ const render = (props) => {
       const intersects = props.raycaster.intersectObjects(props.scene.children)
 
       if (intersects[0] && intersects[0].object === cube) setRotationing(!rotationing)
+      if (intersects[0] && intersects[0].object === cube && props.onClick) props.onClick()
     }
 
     props.renderer.domElement.addEventListener('click', event)
@@ -47,6 +48,7 @@ const render = (props) => {
 
   React.useEffect(() => {
     props.scene.add(cube)
+    return () => props.scene.remove(cube)
   }, [])
 }
 
