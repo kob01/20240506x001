@@ -20,7 +20,7 @@ const render = (props) => {
     return points
   },[])
 
-  React.useEffect(() => {
+  React.useEffectImmediate(() => {
     props.scene.add(points)
     return () => props.scene.remove(points)
   }, [])

@@ -22,4 +22,4 @@ window.addEventListener('wheel', e => e.preventDefault(), { passive: false })
 window.addEventListener('touchmove', e => e.preventDefault(), { passive: false })
 window.addEventListener('contextmenu', e => e.preventDefault(), { passive: false })
 
-React.render(App)
+React.mount(App).render()

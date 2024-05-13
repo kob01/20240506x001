@@ -1,7 +1,14 @@
 var contextQueue = []
 var contextQueueRecordCount = []
 
+var renderComponent = undefined
+
 var renderQueue = { alternate: 'root', children: [] }
+
+var renderQueueInRender = false
+var renderQueueShouldRender = false
+
+var renderQueueCallback = []
 
 var renderQueueNode = undefined
 var renderQueueNodeChildrenIndex = 0
@@ -10,7 +17,10 @@ var renderQueueHooks = []
 var renderQueueHook = undefined
 
 const destory = (node) => {
-  node.hooks.filter(i => i.type === useEffect && i.effectPrevious && typeof i.effectPrevious === 'function').forEach(i => i.effectPrevious())
+  node.hooks
+    .filter(i => i.type === useEffect && i.effectPrevious && typeof i.effectPrevious === 'function')
+    .forEach(i => renderQueueCallback.push(() => i.effectPrevious()))
+
   node.children.forEach(i => destory(i))
 }
 
@@ -64,13 +74,32 @@ const component = (alternate) => {
   }
 }
 
-const render = (component) => {
+const mount = (component) => {
+  renderComponent = component
+  return React
+}
+
+const render = () => {
+  renderQueueInRender = true
+
   renderQueueNode = renderQueue
   renderQueueNodeChildrenIndex = 0
 
-  component()
+  renderQueueCallback.forEach(i => i())
+  renderQueueCallback = []
 
-  requestAnimationFrame(() => render(component))
+  renderComponent()
+
+  renderQueueCallback.forEach(i => i())
+
+  requestAnimationFrame(() => {
+    const renderQueueShouldRenderCache = renderQueueShouldRender
+
+    renderQueueInRender = false
+    renderQueueShouldRender = false
+
+    if (renderQueueShouldRenderCache) render()
+  })
 }
 
 const hook = (callback) => {
@@ -104,7 +133,46 @@ const useState = (state) => {
 
   renderQueueHook.hooks[renderQueueHook.index] = hook
 
-  return [hook.state, (state) => hook.state = state]
+  const setState = (state) => {
+    if (typeof state === 'function') {
+      renderQueueCallback.push(() => hook.state = state(hook.state))
+      if (renderQueueInRender === true) renderQueueShouldRender = true
+      if (renderQueueInRender === false) requestAnimationFrame(render)
+    }
+
+    if (typeof state !== 'function') {
+      renderQueueCallback.push(() => hook.state = state)
+      if (renderQueueInRender === true) renderQueueShouldRender = true
+      if (renderQueueInRender === false) requestAnimationFrame(render)
+    }
+  }
+
+  return [hook.state, setState]
+}
+
+const useStateImmediate = (state) => {
+  var hook
+
+  if (hook === undefined) hook = renderQueueHook.hooks[renderQueueHook.index]
+  if (hook === undefined) hook = { state: state }
+
+  renderQueueHook.hooks[renderQueueHook.index] = hook
+
+  const setState = (state) => {
+    if (typeof state === 'function') {
+      hook.state = state(hook.state)
+      if (renderQueueInRender === true) renderQueueShouldRender = true
+      if (renderQueueInRender === false) requestAnimationFrame(render)
+    }
+
+    if (typeof state !== 'function') {
+      hook.state = state
+      if (renderQueueInRender === true) renderQueueShouldRender = true
+      if (renderQueueInRender === false) requestAnimationFrame(render)
+    }
+  }
+
+  return [hook.state, setState]
 }
 
 const useRef = (current) => {
@@ -119,6 +187,20 @@ const useRef = (current) => {
 }
 
 const useEffect = (effect, dependence) => {
+  var hook
+
+  if (hook === undefined) hook = renderQueueHook.hooks[renderQueueHook.index]
+  if (hook === undefined) hook = { effect: effect }
+
+  renderQueueHook.hooks[renderQueueHook.index] = hook
+
+  if (hook.dependence === undefined || hook.dependence.some((i, index) => i !== dependence[index])) renderQueueCallback.push(() => hook.effectPrevious = hook.effectPrevious && typeof hook.effectPrevious === 'function' ? hook.effectPrevious() : undefined)
+  if (hook.dependence === undefined || hook.dependence.some((i, index) => i !== dependence[index])) renderQueueCallback.push(() => hook.effectPrevious = effect())
+
+  hook.dependence = dependence
+}
+
+const useEffectImmediate = (effect, dependence) => {
   var hook
 
   if (hook === undefined) hook = renderQueueHook.hooks[renderQueueHook.index]
@@ -147,8 +229,8 @@ const useMemo = (memo, dependence) => {
   return hook.state
 }
 
-const React = { render, component, contextProvider, useContext, useState, useRef, useEffect, useMemo }
+const React = { mount, render, component, contextProvider, useContext, useState, useStateImmediate, useRef, useEffect, useEffectImmediate, useMemo }
 
-Object.keys(React).filter(i => [useState, useRef, useEffect, useMemo].includes(React[i])).forEach(i => React[i] = hook(React[i]))
+Object.keys(React).filter(i => [useState, useStateImmediate, useRef, useEffect, useEffectImmediate, useMemo].includes(React[i])).forEach(i => React[i] = hook(React[i]))
 
 export default React

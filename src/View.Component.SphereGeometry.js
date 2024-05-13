@@ -7,14 +7,15 @@ const render = (props) => {
     new THREE.Mesh(
       new THREE.SphereGeometry(props.radius, props.widthSegments, props.heightSegments),
       new THREE.MeshBasicMaterial({ color: props.color, wireframe: props.wireframe })
-    )
-  ,[])
+    ),
+    []
+  )
 
   meth.position.x = props.x
   meth.position.y = props.y
   meth.position.z = props.z
 
-  React.useEffect(() => {
+  React.useEffectImmediate(() => {
     props.scene.add(meth)
     return () => props.scene.remove(meth)
   }, [])

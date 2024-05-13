@@ -22,7 +22,7 @@ const render = (props) => {
   var hexZ = 0x0000ff
   var arrowHelperZ = React.useMemo(() => new THREE.ArrowHelper(dirZ, originZ, lengthZ, hexZ), [])
 
-  React.useEffect(() => {
+  React.useEffectImmediate(() => {
     props.scene.add(arrowHelperX)
     props.scene.add(arrowHelperY)
     props.scene.add(arrowHelperZ)

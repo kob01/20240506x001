@@ -5,7 +5,7 @@ import React from "./utils.react"
 const render = (props) => {
   const cameraHelper = React.useMemo(() => new THREE.CameraHelper(props.camera), [props.camera])
 
-  React.useEffect(() => {
+  React.useEffectImmediate(() => {
     props.scene.add(cameraHelper)
     return () => props.scene.remove(cameraHelper)
   }, [])

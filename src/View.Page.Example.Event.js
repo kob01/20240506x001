@@ -14,7 +14,7 @@ const render = (props) => {
     context.renderer.domElement.addEventListener('click', event)
 
     return () => {
-      context.renderer.domElement.removeEventListener('click', event)
+    context.renderer.domElement.removeEventListener('click', event)
     }
   }, [props.rotate, props.nowDiff])
 }

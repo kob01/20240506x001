@@ -13,16 +13,14 @@ const render = (props) => {
   cube.rotation.x = x
   cube.rotation.y = y
 
+  cube.position.x = props.x
+  cube.position.y = props.y
+  cube.position.z = props.z
+
   if (rotationing) {
     setX(x + props.rotationRateX)
     setY(y + props.rotationRateY)
   }
-
-  React.useEffect(() => {
-    cube.position.x = props.x
-    cube.position.y = props.y
-    cube.position.z = props.z
-  }, [])
 
   React.useEffect(() => {
     const event = (event) => {
@@ -44,7 +42,7 @@ const render = (props) => {
     }
   }, [rotationing])
 
-  React.useEffect(() => {
+  React.useEffectImmediate(() => {
     props.scene.add(cube)
     return () => props.scene.remove(cube)
   }, [])

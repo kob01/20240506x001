@@ -12,7 +12,7 @@ function App() {
 
   const context = { scene: scene, camera: camera, renderer: renderer, raycaster: raycaster }
 
-  React.useEffect(() => {
+  React.useEffectImmediate(() => {
     document.body.appendChild(renderer.domElement)
 
     const resize = () => {
