@@ -125,6 +125,13 @@ const useContext = () => {
   return contextQueue[contextQueue.length - 1]
 }
 
+const useRender = () => {
+  return () => {
+    if (renderQueueInRender === true) renderQueueShouldRender = true
+    if (renderQueueInRender === false) requestAnimationFrame(render)
+  }
+}
+
 const useState = (state) => {
   var hook
 
@@ -134,17 +141,11 @@ const useState = (state) => {
   renderQueueHook.hooks[renderQueueHook.index] = hook
 
   const setState = (state) => {
-    if (typeof state === 'function') {
-      renderQueueCallback.push(() => hook.state = state(hook.state))
-      if (renderQueueInRender === true) renderQueueShouldRender = true
-      if (renderQueueInRender === false) requestAnimationFrame(render)
-    }
+    if (typeof state === 'function') renderQueueCallback.push(() => hook.state = state(hook.state))
+    if (typeof state !== 'function') renderQueueCallback.push(() => hook.state = state)
 
-    if (typeof state !== 'function') {
-      renderQueueCallback.push(() => hook.state = state)
-      if (renderQueueInRender === true) renderQueueShouldRender = true
-      if (renderQueueInRender === false) requestAnimationFrame(render)
-    }
+    if (renderQueueInRender === true) renderQueueShouldRender = true
+    if (renderQueueInRender === false) requestAnimationFrame(render)
   }
 
   return [hook.state, setState]
@@ -159,17 +160,11 @@ const useStateImmediate = (state) => {
   renderQueueHook.hooks[renderQueueHook.index] = hook
 
   const setState = (state) => {
-    if (typeof state === 'function') {
-      hook.state = state(hook.state)
-      if (renderQueueInRender === true) renderQueueShouldRender = true
-      if (renderQueueInRender === false) requestAnimationFrame(render)
-    }
+    if (typeof state === 'function') hook.state = state(hook.state)
+    if (typeof state !== 'function') hook.state = state
 
-    if (typeof state !== 'function') {
-      hook.state = state
-      if (renderQueueInRender === true) renderQueueShouldRender = true
-      if (renderQueueInRender === false) requestAnimationFrame(render)
-    }
+    if (renderQueueInRender === true) renderQueueShouldRender = true
+    if (renderQueueInRender === false) requestAnimationFrame(render)
   }
 
   return [hook.state, setState]
@@ -229,7 +224,7 @@ const useMemo = (memo, dependence) => {
   return hook.state
 }
 
-const React = { mount, render, component, contextProvider, useContext, useState, useStateImmediate, useRef, useEffect, useEffectImmediate, useMemo }
+const React = { mount, render, component, contextProvider, useContext, useRender, useState, useStateImmediate, useRef, useEffect, useEffectImmediate, useMemo }
 
 Object.keys(React).filter(i => [useState, useStateImmediate, useRef, useEffect, useEffectImmediate, useMemo].includes(React[i])).forEach(i => React[i] = hook(React[i]))
 
