@@ -213,6 +213,7 @@ const useMemo = (memo, dependence) => {
   var hook
 
   if (hook === undefined) hook = renderQueueHook.hooks[renderQueueHook.index]
+  if (hook === undefined)console.log(1)
   if (hook === undefined) hook = { memo: memo }
 
   renderQueueHook.hooks[renderQueueHook.index] = hook
