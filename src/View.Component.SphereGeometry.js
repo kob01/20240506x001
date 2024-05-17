@@ -36,11 +36,6 @@ const render = (props) => {
     }
   }, [props.onClick])
 
-  React.useEffectImmediate(() => {
-    props.scene.add(meth)
-    return () => props.scene.remove(meth)
-  }, [])
-
   return meth
 }
 

@@ -7,8 +7,6 @@ import SphereGeometry from './View.Component.SphereGeometry'
 const PlanetComponent = (props) => {
   const context = React.useContext()
 
-  const contextProps = { scene: context.scene, raycaster: context.raycaster, camera: context.camera, renderer: context.renderer }
-
   const [rotateing, setRotateing] = React.useState(true)
   const [rotateAngle, setRotateAngle] = React.useState((props.angle || 0))
   const [position, setPosition] = React.useState([props.x, props.y, props.z])
@@ -27,7 +25,12 @@ const PlanetComponent = (props) => {
     )
   })
 
-  SphereGeometry({ x: position[0], y: position[1], z: position[2], radius: props.radius, widthSegments: props.widthSegments, heightSegments: props.heightSegments, color: props.color, wireframe: props.wireframe, onClick: onClick, ...contextProps })
+  const sphereGeometry = SphereGeometry({ x: position[0], y: position[1], z: position[2], radius: props.radius, widthSegments: props.widthSegments, heightSegments: props.heightSegments, color: props.color, wireframe: props.wireframe, onClick: onClick, ...context})
+
+  React.useEffectImmediate(() => {
+    context.scene.add(sphereGeometry)
+    return () => context.scene.remove(sphereGeometry)
+  }, [])
 }
 
 const Planet =  React.component(PlanetComponent)

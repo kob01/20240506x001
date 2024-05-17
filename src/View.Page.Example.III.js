@@ -10,32 +10,18 @@ const render = () => {
 
   const render = React.useRender()
 
-  // const axesHelper = React.useMemo(() => new THREE.AxesHelper(5), [])
-  // const directionalLight = React.useMemo(() => new THREE.DirectionalLight(0xffffff, 0.5), [])
-
   React.useEffectImmediate(() => {
     context.camera.position.set(12, 12, 12)
     context.camera.lookAt(new THREE.Vector3(0, 0, 0))
   }, [])
 
-  // React.useEffectImmediate(() => {
-  //   directionalLight.position.set(20, 0, 20)
-  // }, [])
-
   React.useEffectImmediate(() => {
     const orbitControls = new OrbitControls(context.camera, context.renderer.domElement)
     orbitControls.addEventListener('change', render)
+    return () => {
+      orbitControls.dispose()
+    }
   }, [])
-
-  // React.useEffectImmediate(() => {
-  //   context.scene.add(axesHelper)
-  //   return () => context.scene.remove(axesHelper)
-  // }, [])
-
-  // React.useEffectImmediate(() => {
-  //   context.scene.add(directionalLight)
-  //   return () => context.scene.remove(directionalLight)
-  // }, [])
 
   Map()
 }

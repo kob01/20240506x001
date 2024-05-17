@@ -13,7 +13,7 @@ function App() {
   const renderer = React.useMemo(() => new THREE.WebGLRenderer({ antialias: true }), [])
   const raycaster = React.useMemo(() => new THREE.Raycaster(), [])
 
-  const context = { scene: scene, camera: camera, renderer: renderer, raycaster: raycaster, canvas: renderer.domElement }
+  const context = { scene: scene, camera: camera, renderer: renderer, raycaster: raycaster }
 
   const render = React.useRender()
 

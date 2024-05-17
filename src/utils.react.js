@@ -1,3 +1,5 @@
+import * as THREE from 'three'
+
 var contextQueue = []
 var contextQueueRecordCount = []
 
@@ -58,7 +60,7 @@ const component = (alternate) => {
     renderQueueHooks.push({ hooks: node.hooks, index: 0 })
     renderQueueHook = renderQueueHooks[renderQueueHooks.length - 1]
 
-    node.alternate(props)
+    const result = node.alternate(props)
 
     node.children.filter((i, index) => index > renderQueueNodeChildrenIndex || index === renderQueueNodeChildrenIndex).forEach(i => destory(i))
     node.children = node.children.filter((i, index) => index < renderQueueNodeChildrenIndex)
@@ -71,6 +73,8 @@ const component = (alternate) => {
 
     renderQueueHooks = renderQueueHooks.filter((i, index) => index < renderQueueHooks.length - 1)
     renderQueueHook = renderQueueHooks[renderQueueHooks.length - 1]
+
+    return result
   }
 }
 
@@ -213,7 +217,6 @@ const useMemo = (memo, dependence) => {
   var hook
 
   if (hook === undefined) hook = renderQueueHook.hooks[renderQueueHook.index]
-  if (hook === undefined)console.log(1)
   if (hook === undefined) hook = { memo: memo }
 
   renderQueueHook.hooks[renderQueueHook.index] = hook
