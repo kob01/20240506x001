@@ -1,5 +1,3 @@
-import * as THREE from 'three'
-
 var contextQueue = []
 var contextQueueRecordCount = []
 
@@ -22,6 +20,10 @@ const destory = (node) => {
   node.hooks
     .filter(i => i.type === useEffect && i.effectPrevious && typeof i.effectPrevious === 'function')
     .forEach(i => renderQueueCallback.push(() => i.effectPrevious()))
+
+  node.hooks
+    .filter(i => i.type === useEffectImmediate && i.effectPrevious && typeof i.effectPrevious === 'function')
+    .forEach(i => i.effectPrevious())
 
   node.children.forEach(i => destory(i))
 }

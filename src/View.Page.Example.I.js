@@ -5,7 +5,7 @@ import React from './utils.react'
 
 import Galaxy from './View.Page.Example.I.Galaxy'
 
-const render = () => {
+const App = () => {
   const context = React.useContext()
 
   const render = React.useRender()
@@ -23,4 +23,4 @@ const render = () => {
   Galaxy()
 }
 
-export default React.component(render)
+export default React.component(App)

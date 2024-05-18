@@ -3,8 +3,10 @@ import * as THREE from 'three'
 import React from './utils.react'
 
 const useEvent = (props) => {
+  const dependence = props.dependence ? props.dependence : []
+
   React.useEffectImmediate(() => {
-    const mouseEvent = e => {
+    const mouseEvent = (e, callback) => {
       var x = (e.clientX / props.renderer.domElement.width) * 2 - 1
       var y = (e.clientY / props.renderer.domElement.height) * 2 - 1
       y = y * -1
@@ -14,12 +16,10 @@ const useEvent = (props) => {
       const intersects = props.raycaster.intersectObjects(props.scene.children)
       const intersectsFindIndex = intersects.findIndex(i => i.object === props.object)
 
-      if (intersectsFindIndex !== -1 && props.onClick) props.onClick(e, intersectsFindIndex)
-      if (intersectsFindIndex !== -1 && props.onMousedown) props.onMousedown(e, intersectsFindIndex)
-      if (intersectsFindIndex !== -1 && props.onMouseup) props.onMouseup(e, intersectsFindIndex)
+      if (intersectsFindIndex !== -1 && callback) callback(e, intersectsFindIndex)
     }
 
-    const touchEvent = e => {
+    const touchEvent = (e, callback) => {
       var x = (e.targetTouches[0].pageX / props.renderer.domElement.width) * 2 - 1
       var y = (e.targetTouches[0].pageY / props.renderer.domElement.height) * 2 - 1
       y = y * -1
@@ -29,27 +29,32 @@ const useEvent = (props) => {
       const intersects = props.raycaster.intersectObjects(props.scene.children)
       const intersectsFindIndex = intersects.findIndex(i => i.object === props.object)
 
-      if (intersectsFindIndex !== -1 && props.onTouchstart) props.onTouchstart(e, intersectsFindIndex)
-      if (intersectsFindIndex !== -1 && props.onTouchmove) props.onTouchmove(e, intersectsFindIndex)
-      if (intersectsFindIndex !== -1 && props.onTouchend) props.onTouchend(e, intersectsFindIndex)
+      if (intersectsFindIndex !== -1 && callback) callback(e, intersectsFindIndex)
     }
 
-    props.renderer.domElement.addEventListener('click', mouseEvent)
-    props.renderer.domElement.addEventListener('mousedown', mouseEvent)
-    props.renderer.domElement.addEventListener('mouseup', mouseEvent)
-    props.renderer.domElement.addEventListener('touchstart', touchEvent)
-    props.renderer.domElement.addEventListener('touchmove', touchEvent)
-    props.renderer.domElement.addEventListener('touchend', touchEvent)
+    const onClick = e => mouseEvent(e, props.onClick)
+    const onMousedown = e => mouseEvent(e, props.onMousedown)
+    const onMouseup = e => mouseEvent(e, props.onMouseup)
+    const onTouchstart = e => mouseEvent(e, props.onTouchstart)
+    const onTouchmove = e => mouseEvent(e, props.onTouchmove)
+    const onTouchend = e => mouseEvent(e, props.onTouchend)
+
+    props.renderer.domElement.addEventListener('click', onClick)
+    props.renderer.domElement.addEventListener('mousedown', onMousedown)
+    props.renderer.domElement.addEventListener('mouseup', onMouseup)
+    props.renderer.domElement.addEventListener('touchstart', onTouchstart)
+    props.renderer.domElement.addEventListener('touchmove', onTouchmove)
+    props.renderer.domElement.addEventListener('touchend', onTouchend)
 
     return () => {
-      props.renderer.domElement.removeEventListener('click', mouseEvent)
-      props.renderer.domElement.removeEventListener('mousedown', mouseEvent)
-      props.renderer.domElement.removeEventListener('mouseup', mouseEvent)
-      props.renderer.domElement.removeEventListener('touchstart', touchEvent)
-      props.renderer.domElement.removeEventListener('touchmove', touchEvent)
-      props.renderer.domElement.removeEventListener('touchend', touchEvent)
+      props.renderer.domElement.removeEventListener('click', onClick)
+      props.renderer.domElement.removeEventListener('mousedown', onMousedown)
+      props.renderer.domElement.removeEventListener('mouseup', onMouseup)
+      props.renderer.domElement.removeEventListener('touchstart', onTouchstart)
+      props.renderer.domElement.removeEventListener('touchmove', onTouchmove)
+      props.renderer.domElement.removeEventListener('touchend', onTouchend)
     }
-  }, [props.onClick, props.onMousedown, props.onMouseup, props.onTouchstart, props.onTouchmove, props.onTouchend])
+  }, [props.renderer, props.camera, props.scene, props.raycaster, props.onClick, props.onMousedown, props.onMouseup, props.onTouchstart, props.onTouchmove, props.onTouchend, ...dependence])
 }
 
 const useObject = (props) => {
@@ -57,7 +62,6 @@ const useObject = (props) => {
     props.target.add(props.object)
     return () => {
       props.target.remove(props.object)
-      props.object.dispose()
     }
   }, [props.object, props.target])
 }

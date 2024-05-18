@@ -7,22 +7,24 @@ import Building from './View.Page.Example.III.Building'
 
 const json = {
   map: [
-    [{ type: 0 }, { type: 0 }, { type: 0 }, { type: 0 }],
-    [{ type: 0 }, { type: 3 }, { type: 3 }, { type: 3 }],
-    [{ type: 0 }, { type: 0 }, { type: 0 }, { type: 0 }],
-    [{ type: 0 }, { type: 3 }, { type: 0 }, { type: 0 }],
-    [{ type: 1 }, { type: 3 }, { type: 0 }, { type: 0 }],
-    [{ type: 0 }, { type: 0 }, { type: 0 }, { type: 0 }],
-    [{ type: 0 }, { type: 0 }, { type: 0 }, { type: 0 }],
-    [{ type: 0 }, { type: 3 }, { type: 0 }, { type: 0 }],
-    [{ type: 3 }, { type: 3 }, { type: 0 }, { type: 0 }],
-    [{ type: 3 }, { type: 0 }, { type: 2 }, { type: 0 }],
-    [{ type: 3 }, { type: 0 }, { type: 0 }, { type: 0 }],
-    [{ type: 0 }, { type: 0 }, { type: 0 }, { type: 0 }],
+    [{ type: 0x000 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }],
+    [{ type: 0x000 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }],
+    [{ type: 0x000 }, { type: 0x000 }, { type: 0x003 }, { type: 0x003 }, { type: 0x003 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }],
+    [{ type: 0x000 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }, { type: 0x002 }, { type: 0x000 }],
+    [{ type: 0x000 }, { type: 0x000 }, { type: 0x003 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }],
+    [{ type: 0x000 }, { type: 0x001 }, { type: 0x003 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }],
+    [{ type: 0x000 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }, { type: 0x001 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }],
+    [{ type: 0x000 }, { type: 0x000 }, { type: 0x000 }, { type: 0x003 }, { type: 0x003 }, { type: 0x003 }, { type: 0x003 }, { type: 0x000 }],
+    [{ type: 0x000 }, { type: 0x000 }, { type: 0x003 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }],
+    [{ type: 0x000 }, { type: 0x003 }, { type: 0x003 }, { type: 0x000 }, { type: 0x000 }, { type: 0x003 }, { type: 0x000 }, { type: 0x000 }],
+    [{ type: 0x000 }, { type: 0x003 }, { type: 0x000 }, { type: 0x002 }, { type: 0x000 }, { type: 0x003 }, { type: 0x000 }, { type: 0x000 }],
+    [{ type: 0x000 }, { type: 0x003 }, { type: 0x000 }, { type: 0x003 }, { type: 0x000 }, { type: 0x003 }, { type: 0x000 }, { type: 0x000 }],
+    [{ type: 0x000 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }],
+    [{ type: 0x000 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }],
   ],
 }
 
-const render = () => {
+const App = () => {
   const context = React.useContext()
 
   const group = React.useMemo(() => new THREE.Group(), [])
@@ -43,4 +45,4 @@ const render = () => {
   ReactPlugin.useObject({ target: context.scene, object: group })
 }
 
-export default React.component(render)
+export default React.component(App)
