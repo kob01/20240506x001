@@ -4,6 +4,13 @@ import React from './utils.react'
 
 import App from './View.App'
 
+import icon from '../static/icon.png'
+
+const link = document.createElement('link')
+link.rel = 'icon'
+link.href = icon
+document.head.append(link)
+
 const style = document.createElement('style')
 
 const styleString =

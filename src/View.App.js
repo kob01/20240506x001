@@ -33,10 +33,6 @@ function App() {
     window.addEventListener('resize', resize)
   }, [])
 
-  React.useEffectImmediate(() => {
-    renderer.domElement.style.background = 'transparent'
-  }, [])
-
   if (new URLSearchParams(new URL(window.location.href).search).get('example') === '1') ExampleI()
   if (new URLSearchParams(new URL(window.location.href).search).get('example') === '2') ExampleII()
   if (new URLSearchParams(new URL(window.location.href).search).get('example') === '3') ExampleIII()

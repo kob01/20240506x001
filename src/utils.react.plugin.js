@@ -35,9 +35,9 @@ const useEvent = (props) => {
     const onClick = e => mouseEvent(e, props.onClick)
     const onMousedown = e => mouseEvent(e, props.onMousedown)
     const onMouseup = e => mouseEvent(e, props.onMouseup)
-    const onTouchstart = e => mouseEvent(e, props.onTouchstart)
-    const onTouchmove = e => mouseEvent(e, props.onTouchmove)
-    const onTouchend = e => mouseEvent(e, props.onTouchend)
+    const onTouchstart = e => touchEvent(e, props.onTouchstart)
+    const onTouchmove = e => touchEvent(e, props.onTouchmove)
+    const onTouchend = e => touchEvent(e, props.onTouchend)
 
     props.renderer.domElement.addEventListener('click', onClick)
     props.renderer.domElement.addEventListener('mousedown', onMousedown)
@@ -54,14 +54,16 @@ const useEvent = (props) => {
       props.renderer.domElement.removeEventListener('touchmove', onTouchmove)
       props.renderer.domElement.removeEventListener('touchend', onTouchend)
     }
-  }, [props.renderer, props.camera, props.scene, props.raycaster, props.onClick, props.onMousedown, props.onMouseup, props.onTouchstart, props.onTouchmove, props.onTouchend, ...dependence])
+  }, [props.renderer, props.camera, props.scene, props.raycaster, props.object, props.onClick, props.onMousedown, props.onMouseup, props.onTouchstart, props.onTouchmove, props.onTouchend, ...dependence])
 }
 
 const useObject = (props) => {
   React.useEffectImmediate(() => {
-    props.target.add(props.object)
-    return () => {
-      props.target.remove(props.object)
+    if (props.target && props.object) {
+      props.target.add(props.object)
+      return () => {
+        props.target.remove(props.object)
+      }
     }
   }, [props.object, props.target])
 }

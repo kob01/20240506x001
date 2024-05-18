@@ -27,9 +27,17 @@ const json = {
 const App = () => {
   const context = React.useContext()
 
-  const group = React.useMemo(() => new THREE.Group(), [])
+  const group = React.useMemo(() => {
+    const group = new THREE.Group()
 
-  const building = (map, column, row) => {
+    group.position.x = 0
+    group.position.y = 0
+    group.position.z = 0
+
+    return group
+  }, [])
+
+  const build = (map, column, row) => {
     Building(
       {
         type: map[column][row].type,
@@ -40,7 +48,7 @@ const App = () => {
     )
   }
 
-  json.map.forEach((i, column) => i.forEach((i, row) => building(json.map, column, row)))
+  json.map.forEach((i, column) => i.forEach((i, row) => build(json.map, column, row)))
 
   ReactPlugin.useObject({ target: context.scene, object: group })
 }
