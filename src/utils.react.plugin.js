@@ -22,11 +22,12 @@ const useEvent = (props) => {
       const intersectsFindIndex = intersects.findIndex(i => i.object === props.object)
 
       if (intersectsFindIndex !== -1 && callback) callback(e, intersectsFindIndex)
+      if (intersectsFindIndex === -1 && callback && props.object === undefined) callback(e, intersectsFindIndex)
     }
 
     const touchEvent = (e, callback) => {
-      var x = (e.targetTouches[0].pageX / props.renderer.domElement.width) * 2 - 1
-      var y = (e.targetTouches[0].pageY / props.renderer.domElement.height) * 2 - 1
+      var x = (e.changedTouches[0].pageX / props.renderer.domElement.width) * 2 - 1
+      var y = (e.changedTouches[0].pageY / props.renderer.domElement.height) * 2 - 1
       y = y * -1
 
       props.raycaster.setFromCamera(new THREE.Vector2(x, y * -1), props.camera)
@@ -35,6 +36,7 @@ const useEvent = (props) => {
       const intersectsFindIndex = intersects.findIndex(i => i.object === props.object)
 
       if (intersectsFindIndex !== -1 && callback) callback(e, intersectsFindIndex)
+      if (intersectsFindIndex === -1 && callback && props.object === undefined) callback(e, intersectsFindIndex)
     }
 
     const onClick = e => mouseEvent(e, props.onClick)

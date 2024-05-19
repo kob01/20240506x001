@@ -7,13 +7,14 @@ import ReactPlugin from './utils.react.plugin'
 const App = () => {
   const context = React.useContext()
 
-  const [animationCount, setAnimationCount] = ReactPlugin.useAnimationCount(0)
+  const [animationProcess, setAnimationProcess] = React.useState(0)
+  const [animationFlow, setAnimationFlow] = React.useState(0)
 
   const Object0o0001 = React.useMemo(() => {
     const group = new THREE.Group()
 
     group.position.x = 0
-    group.position.y = 0
+    group.position.y = 8
     group.position.z = 0
 
     return group
@@ -62,17 +63,27 @@ const App = () => {
   }, [Object0o0001, Object0o0002])
 
   React.useEffectImmediate(() => {
-    if (Object0o0001 === undefined || Object0o0002 === undefined) {
-      setAnimationCount(0)
+    if (Object0o0001 !== undefined && Object0o0002 !== undefined) {
+      Object0o0002.material.forEach(i => i.opacity = animationProcess / 60 * 1)
     }
-  }, [Object0o0001, Object0o0002])
+  }, [Object0o0001, Object0o0002, animationProcess])
 
   React.useEffectImmediate(() => {
-    if (Object0o0001 !== undefined && Object0o0002 !== undefined && animationCount > 60 === false) {
-      Object0o0001.position.y = 12 - 4 / 60 * animationCount
-      Object0o0002.material.forEach(i => i.opacity = 1 / 60 * animationCount)
+    if (Object0o0001 !== undefined && Object0o0002 !== undefined && animationFlow === 0 && animationProcess < 60) {
+      setAnimationProcess(animationProcess + 1)
     }
-  }, [Object0o0001, Object0o0002, animationCount])
+    if (Object0o0001 !== undefined && Object0o0002 !== undefined && animationFlow === 1 && animationProcess > 0) {
+      setAnimationProcess(animationProcess - 1)
+    }
+  })
+
+  const event = React.useMemo(() => {
+    const s = () => setAnimationFlow(1)
+    const e = () => setAnimationFlow(0)
+    return { onMousedown: s, onMouseup: e, onTouchstart: s, onTouchend: e }
+  }, [])
+
+  ReactPlugin.useEvent({ ...context, ...event })
 
   ReactPlugin.useObject({ target: Object0o0001, object: Object0o0002 })
   ReactPlugin.useObject({ target: Object0o0001, object: Object0o0003 })

@@ -32,6 +32,18 @@ const map = {
   ]
 }
 
+const useCamera = () => {
+  const context = React.useContext()
+
+  React.useEffectImmediate(() => {
+    const position = Math.max(20000 / context.renderer.domElement.width, 20000 / context.renderer.domElement.height)
+
+    context.camera.position.set(0, position, position)
+
+    context.camera.lookAt(new THREE.Vector3(0, 0, 0))
+  }, [])
+}
+
 const useAmbientLight = () => {
   const context = React.useContext()
 
@@ -51,8 +63,8 @@ const useOrbitControls = () => {
     orbitControls.autoRotate = true
     orbitControls.enableDamping = true
     orbitControls.enablePan = false
-    orbitControls.minPolarAngle = Math.PI * 0.25
-    orbitControls.maxPolarAngle = Math.PI * 0.25
+    orbitControls.minPolarAngle = Math.PI * 0.15
+    orbitControls.maxPolarAngle = Math.PI * 0.35
     orbitControls.addEventListener('change', render)
     return () => {
       orbitControls.removeEventListener('change', render)
@@ -63,15 +75,6 @@ const useOrbitControls = () => {
   React.useEffectImmediate(() => orbitControls.update())
 
   React.useEffectImmediate(() => render())
-}
-
-const useCamera = () => {
-  const context = React.useContext()
-
-  React.useEffectImmediate(() => {
-    context.camera.position.set(0, 0, Math.max(25000 / context.renderer.domElement.width, 25000 / context.renderer.domElement.height))
-    context.camera.lookAt(new THREE.Vector3(0, 0, 0))
-  }, [])
 }
 
 const useLoadFont = () => {
@@ -114,7 +117,7 @@ const App = () => {
 
   React.contextProvider({ ...context, map })
 
-  new Array(useAmbientLight, useOrbitControls, useCamera, useLoadFont, useLoadModel, useAnimationRecord, useEmemy).forEach(i => i())
+  new Array(useCamera, useAmbientLight, useOrbitControls, useLoadFont, useLoadModel, useAnimationRecord, useEmemy).forEach(i => i())
 
   new Array(Text, Building, Enemy).forEach(i => i())
 }
