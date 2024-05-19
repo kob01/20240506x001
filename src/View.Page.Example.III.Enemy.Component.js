@@ -4,12 +4,12 @@ import { TextGeometry } from 'three/addons/geometries/TextGeometry.js'
 import React from './utils.react'
 import ReactPlugin from './utils.react.plugin'
 
-const Type0x000 = (props) => {
+const Type0o0000 = (props) => {
   // const context = React.useContext()
 
   // const animationCount = context.animationCount
 
-  // const Object0x001 = React.useMemo(() => {
+  // const Object0o0001 = React.useMemo(() => {
   //   const group = new THREE.Group()
 
   //   group.position.x = 4
@@ -19,18 +19,18 @@ const Type0x000 = (props) => {
   //   return group
   // }, [])
 
-  // const Object0x002 = React.useMemo(() => {
+  // const Object0o0002 = React.useMemo(() => {
   //   if (context.model.xbot === undefined) return
 
   //   return context.model.xbot.scene
   // }, [context.model.xbot])
 
-  // ReactPlugin.useObject({ target: Object0x001, object: Object0x002 })
-  // ReactPlugin.useObject({ target: props.target, object: Object0x001 })
+  // ReactPlugin.useObject({ target: Object0o0001, object: Object0o0002 })
+  // ReactPlugin.useObject({ target: props.target, object: Object0o0001 })
 }
 
 const App = () => {
-  // if (props.cell.type === 0x000 && props.cell.style === 0x000) React.component(Type0x000)(props)
+  // if (props.cell.type === 0o0000 && props.cell.style === 0o0000) React.component(Type0o0000)(props)
 }
 
 export default React.component(App)

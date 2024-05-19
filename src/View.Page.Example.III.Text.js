@@ -9,7 +9,7 @@ const App = () => {
 
   const [animationCount, setAnimationCount] = ReactPlugin.useAnimationCount(0)
 
-  const Object0x001 = React.useMemo(() => {
+  const Object0o0001 = React.useMemo(() => {
     const group = new THREE.Group()
 
     group.position.x = 0
@@ -19,7 +19,7 @@ const App = () => {
     return group
   }, [])
 
-  const Object0x002 = React.useMemo(() => {
+  const Object0o0002 = React.useMemo(() => {
     if (context.font.helvetiker_regular === undefined) return
 
     const geometry = new TextGeometry(
@@ -41,7 +41,7 @@ const App = () => {
     return meth
   }, [context.font.helvetiker_regular])
 
-  const Object0x003 = React.useMemo(() => {
+  const Object0o0003 = React.useMemo(() => {
     const pointLight = new THREE.PointLight(0xffffff, 1)
 
     pointLight.decay = 4
@@ -53,30 +53,30 @@ const App = () => {
   }, [])
 
   React.useEffectImmediate(() => {
-    if (Object0x001 === undefined || Object0x002 === undefined) {
-      Object0x001.visible = false
+    if (Object0o0001 === undefined || Object0o0002 === undefined) {
+      Object0o0001.visible = false
     }
-    if (Object0x001 !== undefined && Object0x002 !== undefined) {
-      Object0x001.visible = true
+    if (Object0o0001 !== undefined && Object0o0002 !== undefined) {
+      Object0o0001.visible = true
     }
-  }, [Object0x001, Object0x002])
+  }, [Object0o0001, Object0o0002])
 
   React.useEffectImmediate(() => {
-    if (Object0x001 === undefined || Object0x002 === undefined) {
+    if (Object0o0001 === undefined || Object0o0002 === undefined) {
       setAnimationCount(0)
     }
-  }, [Object0x001, Object0x002])
+  }, [Object0o0001, Object0o0002])
 
   React.useEffectImmediate(() => {
-    if (Object0x001 !== undefined && Object0x002 !== undefined && animationCount > 60 === false) {
-      Object0x001.position.y = 12 - 4 / 60 * animationCount
-      Object0x002.material.forEach(i => i.opacity = 1 / 60 * animationCount)
+    if (Object0o0001 !== undefined && Object0o0002 !== undefined && animationCount > 60 === false) {
+      Object0o0001.position.y = 12 - 4 / 60 * animationCount
+      Object0o0002.material.forEach(i => i.opacity = 1 / 60 * animationCount)
     }
-  }, [Object0x001, Object0x002, animationCount])
+  }, [Object0o0001, Object0o0002, animationCount])
 
-  ReactPlugin.useObject({ target: Object0x001, object: Object0x002 })
-  ReactPlugin.useObject({ target: Object0x001, object: Object0x003 })
-  ReactPlugin.useObject({ target: context.scene, object: Object0x001 })
+  ReactPlugin.useObject({ target: Object0o0001, object: Object0o0002 })
+  ReactPlugin.useObject({ target: Object0o0001, object: Object0o0003 })
+  ReactPlugin.useObject({ target: context.scene, object: Object0o0001 })
 }
 
 export default React.component(App)
