@@ -5,29 +5,11 @@ import ReactPlugin from './utils.react.plugin'
 
 import Building from './View.Page.Example.III.Building'
 
-const json = {
-  map: [
-    [{ type: 0x000 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }],
-    [{ type: 0x000 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }],
-    [{ type: 0x000 }, { type: 0x000 }, { type: 0x003 }, { type: 0x003 }, { type: 0x003 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }],
-    [{ type: 0x000 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }, { type: 0x002 }, { type: 0x000 }],
-    [{ type: 0x000 }, { type: 0x000 }, { type: 0x003 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }],
-    [{ type: 0x000 }, { type: 0x001 }, { type: 0x003 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }],
-    [{ type: 0x000 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }, { type: 0x001 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }],
-    [{ type: 0x000 }, { type: 0x000 }, { type: 0x000 }, { type: 0x003 }, { type: 0x003 }, { type: 0x003 }, { type: 0x003 }, { type: 0x000 }],
-    [{ type: 0x000 }, { type: 0x000 }, { type: 0x003 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }],
-    [{ type: 0x000 }, { type: 0x003 }, { type: 0x003 }, { type: 0x000 }, { type: 0x000 }, { type: 0x003 }, { type: 0x000 }, { type: 0x000 }],
-    [{ type: 0x000 }, { type: 0x003 }, { type: 0x000 }, { type: 0x002 }, { type: 0x000 }, { type: 0x003 }, { type: 0x000 }, { type: 0x000 }],
-    [{ type: 0x000 }, { type: 0x003 }, { type: 0x000 }, { type: 0x003 }, { type: 0x000 }, { type: 0x003 }, { type: 0x000 }, { type: 0x000 }],
-    [{ type: 0x000 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }],
-    [{ type: 0x000 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }, { type: 0x000 }],
-  ],
-}
 
 const App = () => {
   const context = React.useContext()
 
-  const group = React.useMemo(() => {
+  const Object0x000 = React.useMemo(() => {
     const group = new THREE.Group()
 
     group.position.x = 0
@@ -37,20 +19,21 @@ const App = () => {
     return group
   }, [])
 
-  const build = (map, column, row) => {
+  const build = (map, dimension, row, column) => {
     Building(
       {
-        type: map[column][row].type,
-        map: { column: map.length, row: map[0].length },
-        position: { column: column, row: row },
-        target: group,
+        map: map,
+        dimension: dimension,
+        cell: map[row][column],
+        position: { row: row, column: column },
+        target: Object0x000,
       }
     )
   }
 
-  json.map.forEach((i, column) => i.forEach((i, row) => build(json.map, column, row)))
+  context.json.map.forEach((i, row) => i.forEach((i, column) => build(context.json.map, context.json.dimension, row, column)))
 
-  ReactPlugin.useObject({ target: context.scene, object: group })
+  ReactPlugin.useObject({ target: context.scene, object: Object0x000 })
 }
 
 export default React.component(App)

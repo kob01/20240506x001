@@ -68,6 +68,22 @@ const useObject = (props) => {
   }, [props.object, props.target])
 }
 
-const ReactPlugin = { useEvent, useObject }
+const useAnimationCount = (props) => {
+  const count = React.useRef(props.default)
+
+  const render = React.useRender()
+
+  React.useEffectImmediate(() => {
+    count.current = count.current + 1
+  })
+
+  React.useEffectImmediate(() => {
+    if (props.render) render()
+  })
+
+  return count.current
+}
+
+const ReactPlugin = { useEvent, useObject, useAnimationCount }
 
 export default ReactPlugin

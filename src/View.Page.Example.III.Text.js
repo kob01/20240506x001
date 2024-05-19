@@ -1,21 +1,13 @@
 import * as THREE from 'three'
 import { TextGeometry } from 'three/addons/geometries/TextGeometry.js'
-import { FontLoader } from 'three/addons/loaders/FontLoader.js'
-import helvetiker_regular from 'three/examples/fonts/helvetiker_regular.typeface.json'
 
 import React from './utils.react'
 import ReactPlugin from './utils.react.plugin'
 
-const loader = new FontLoader()
-
 const App = () => {
   const context = React.useContext()
 
-  const fontBoundingBox = React.useRef()
-
-  const [font, setFont] = React.useState()
-
-  const group = React.useMemo(() => {
+  const Object0x001 = React.useMemo(() => {
     const group = new THREE.Group()
 
     group.position.x = 0
@@ -25,25 +17,23 @@ const App = () => {
     return group
   }, [])
 
-  const text = React.useMemo(() => {
-    if (font === undefined) return
+  const Object0x002 = React.useMemo(() => {
+    if (context.font.helvetiker_regular === undefined) return
 
-    const textGeometry = new TextGeometry('Arknights Mock', { font: font, size: 1, depth: 0.2, curveSegments: 12, bevelThickness: 20, bevelSize: 8, bevelEnabled: false })
-    const textMaterials = [new THREE.MeshStandardMaterial({ color: 0xffffff }), new THREE.MeshStandardMaterial({ color: 0xffffff })]
-    const textMeth = new THREE.Mesh(textGeometry, textMaterials)
+    const geometry = new TextGeometry('Arknights', { font: context.font.helvetiker_regular, size: 1, depth: 0.2, curveSegments: 12, bevelThickness: 20, bevelSize: 8, bevelEnabled: false })
+    const material = [new THREE.MeshStandardMaterial({ color: 0xffffff }), new THREE.MeshStandardMaterial({ color: 0xffffff })]
+    const meth = new THREE.Mesh(geometry, material)
 
-    textGeometry.computeBoundingBox()
+    geometry.computeBoundingBox()
 
-    fontBoundingBox.current = textGeometry.boundingBox
+    meth.position.x = (geometry.boundingBox.max.x - geometry.boundingBox.min.x) * -1 * 0.5
+    meth.position.y = 0
+    meth.position.z = 0
 
-    textMeth.position.x = (textGeometry.boundingBox.max.x - textGeometry.boundingBox.min.x) * -1 * 0.5
-    textMeth.position.y = 0
-    textMeth.position.z = 0
+    return meth
+  }, [context.font.helvetiker_regular])
 
-    return textMeth
-  }, [font])
-
-  const light = React.useMemo(() => {
+  const Object0x003 = React.useMemo(() => {
     const pointLight = new THREE.PointLight(0xffffff, 1)
 
     pointLight.decay = 1
@@ -54,15 +44,9 @@ const App = () => {
     return pointLight
   }, [])
 
-  React.useEffectImmediate(() => {
-    loader.load(`data:text/plain;base64,${btoa(unescape(encodeURIComponent(JSON.stringify(helvetiker_regular))))}`, font => setFont(font))
-  }, [])
-
-  ReactPlugin.useEvent({ ...context, object: text, onClick: (e, i) => { console.log(1) } })
-
-  ReactPlugin.useObject({ target: group, object: text })
-  ReactPlugin.useObject({ target: group, object: light })
-  ReactPlugin.useObject({ target: context.scene, object: group })
+  ReactPlugin.useObject({ target: Object0x001, object: Object0x002 })
+  ReactPlugin.useObject({ target: Object0x001, object: Object0x003 })
+  ReactPlugin.useObject({ target: context.scene, object: Object0x001 })
 }
 
 export default React.component(App)

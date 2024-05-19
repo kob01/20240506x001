@@ -184,7 +184,7 @@ const useRef = (current) => {
 
   renderQueueHook.hooks[renderQueueHook.index] = hook
 
-  return renderQueueHook
+  return hook
 }
 
 const useEffect = (effect, dependence) => {
