@@ -59,19 +59,23 @@ const useEvent = (props) => {
 
 const useObject = (props) => {
   React.useEffectImmediate(() => {
-    if (props.target && props.object) {
-      props.target.add(props.object)
-      return () => {
-        props.target.remove(props.object)
-      }
+    if (Boolean(props.target) === false) return
+    if (Boolean(props.object) === false) return
+
+    props.target.add(props.object)
+    
+    return () => {
+      props.target.remove(props.object)
     }
-  }, [props.object, props.target])
+  }, [props.target, props.object])
 }
 
 const useAnimationCount = (props) => {
   const count = React.useRef(props.default)
 
   const render = React.useRender()
+
+  const clear = () => count.current = props.default
 
   React.useEffectImmediate(() => {
     count.current = count.current + 1
@@ -81,7 +85,7 @@ const useAnimationCount = (props) => {
     if (props.render) render()
   })
 
-  return count.current
+  return [count.current, clear]
 }
 
 const ReactPlugin = { useEvent, useObject, useAnimationCount }

@@ -7,6 +7,8 @@ import ReactPlugin from './utils.react.plugin'
 const App = () => {
   const context = React.useContext()
 
+  const [animationCount, clearAnimationCount] = ReactPlugin.useAnimationCount({ default: 0 })
+
   const Object0x001 = React.useMemo(() => {
     const group = new THREE.Group()
 
@@ -20,9 +22,17 @@ const App = () => {
   const Object0x002 = React.useMemo(() => {
     if (context.font.helvetiker_regular === undefined) return
 
-    const geometry = new TextGeometry('Arknights', { font: context.font.helvetiker_regular, size: 1, depth: 0.2, curveSegments: 12, bevelThickness: 20, bevelSize: 8, bevelEnabled: false })
-    const material = [new THREE.MeshStandardMaterial({ color: 0xffffff }), new THREE.MeshStandardMaterial({ color: 0xffffff })]
+    const geometry = new TextGeometry(
+      'Arknights',
+      { font: context.font.helvetiker_regular, size: 1, depth: 0.2, curveSegments: 12, bevelThickness: 20, bevelSize: 8, bevelEnabled: false }
+    )
+    const material = [
+      new THREE.MeshStandardMaterial({ color: 0xffffff, transparent: true, opacity: 1 }),
+      new THREE.MeshStandardMaterial({ color: 0xffffff, transparent: true, opacity: 1 }),
+    ]
     const meth = new THREE.Mesh(geometry, material)
+
+    console.log(meth)
 
     geometry.computeBoundingBox()
 
@@ -43,6 +53,13 @@ const App = () => {
 
     return pointLight
   }, [])
+
+  React.useEffectImmediate(() => {
+    if (Object0x001 === undefined || Object0x002 === undefined) return clearAnimationCount()
+
+    Object0x001.position.y = Math.max(10 - 2 / 60 * animationCount, 8)
+    Object0x002.material.forEach(i => i.opacity = Math.min(1 / 60 * animationCount, 1))
+  })
 
   ReactPlugin.useObject({ target: Object0x001, object: Object0x002 })
   ReactPlugin.useObject({ target: Object0x001, object: Object0x003 })
