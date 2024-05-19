@@ -1,6 +1,11 @@
 import * as THREE from 'three'
+import { FontLoader } from 'three/addons/loaders/FontLoader.js'
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 
 import React from './utils.react'
+
+const fontLoader = new FontLoader()
+const gltfLoader = new GLTFLoader()
 
 const useEvent = (props) => {
   const dependence = props.dependence ? props.dependence : []
@@ -63,7 +68,7 @@ const useObject = (props) => {
     if (Boolean(props.object) === false) return
 
     props.target.add(props.object)
-    
+
     return () => {
       props.target.remove(props.object)
     }
@@ -71,23 +76,42 @@ const useObject = (props) => {
 }
 
 const useAnimationCount = (props) => {
-  const count = React.useRef(props.default)
+  const [animationCount, setAnimationCount] = React.useStateImmediate(props)
 
-  const render = React.useRender()
+  React.useEffectImmediate(() => setAnimationCount(animationCount + 1))
 
-  const clear = () => count.current = props.default
-
-  React.useEffectImmediate(() => {
-    count.current = count.current + 1
-  })
-
-  React.useEffectImmediate(() => {
-    if (props.render) render()
-  })
-
-  return [count.current, clear]
+  return [animationCount, setAnimationCount]
 }
 
-const ReactPlugin = { useEvent, useObject, useAnimationCount }
+const useFont = (props) => {
+  const [font, setFont] = React.useState(Object())
+
+  React.useEffectImmediate(() => {
+    props.forEach(i => {
+      if (i.json) {
+        fontLoader.load(`data:text/plain;base64,${btoa(unescape(encodeURIComponent(JSON.stringify(i.json))))}`, value => setFont({ ...font, [i.name]: value }))
+      }
+      if (i.link) {
+        fontLoader.load(i.link, value => setFont({ ...font, [i.name]: value }))
+      }
+    })
+  }, [])
+
+  return [font, setFont]
+}
+
+const useModel = (props) => {
+  const [model, setModel] = React.useState(Object())
+
+  React.useEffectImmediate(() => {
+    props.forEach(i => {
+      if (i.type === 'gltf') gltfLoader.load(i.link, value => setModel({ ...model, [i.name]: value }))
+    })
+  }, [])
+
+  return [model, setModel]
+}
+
+const ReactPlugin = { useEvent, useObject, useAnimationCount, useFont, useModel }
 
 export default ReactPlugin

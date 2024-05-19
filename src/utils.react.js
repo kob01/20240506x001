@@ -91,12 +91,9 @@ const render = () => {
   renderQueueNode = renderQueue
   renderQueueNodeChildrenIndex = 0
 
-  renderQueueCallback.forEach(i => i())
-  renderQueueCallback = []
-
   renderComponent()
 
-  renderQueueCallback.forEach(i => i())
+  while (renderQueueCallback.length !== 0) renderQueueCallback.shift()()
 
   requestAnimationFrame(() => {
     const renderQueueShouldRenderCache = renderQueueShouldRender

@@ -1,7 +1,5 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
-import { FontLoader } from 'three/addons/loaders/FontLoader.js'
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 
 import helvetiker_regular from '../static/font/helvetiker_regular.typeface.json'
 import xbot from '../static/model/xbot.glb'
@@ -9,11 +7,12 @@ import xbot from '../static/model/xbot.glb'
 import React from './utils.react'
 import ReactPlugin from './utils.react.plugin'
 
-import Map from './View.Page.Example.III.Map'
+import Building from './View.Page.Example.III.Building'
 import Text from './View.Page.Example.III.Text'
+import Enemy from './View.Page.Example.III.Enemy'
 
-const json = {
-  map: [
+const map = {
+  building: [
     [{ type: 0x000, style: 0x000 }, { type: 0x000, style: 0x000 }, { type: 0x000, style: 0x000 }, { type: 0x000, style: 0x000 }, { type: 0x000, style: 0x000 }, { type: 0x000, style: 0x000 }, { type: 0x000, style: 0x000 }, { type: 0x000, style: 0x000 }, { type: 0x000, style: 0x000 }, { type: 0x000, style: 0x000 }, { type: 0x000, style: 0x000 }, { type: 0x000, style: 0x000 }],
     [{ type: 0x000, style: 0x000 }, { type: 0x003, style: 0x000 }, { type: 0x000, style: 0x000 }, { type: 0x003, style: 0x000 }, { type: 0x000, style: 0x000 }, { type: 0x000, style: 0x000 }, { type: 0x000, style: 0x000 }, { type: 0x001, style: 0x000 }, { type: 0x001, style: 0x000 }, { type: 0x000, style: 0x000 }, { type: 0x000, style: 0x000 }, { type: 0x000, style: 0x000 }],
     [{ type: 0x000, style: 0x000 }, { type: 0x002, style: 0x000 }, { type: 0x000, style: 0x000 }, { type: 0x000, style: 0x000 }, { type: 0x000, style: 0x000 }, { type: 0x000, style: 0x000 }, { type: 0x000, style: 0x000 }, { type: 0x000, style: 0x000 }, { type: 0x000, style: 0x000 }, { type: 0x000, style: 0x000 }, { type: 0x000, style: 0x000 }, { type: 0x000, style: 0x000 }],
@@ -27,26 +26,26 @@ const json = {
     [{ type: 0x000, style: 0x000 }, { type: 0x000, style: 0x000 }, { type: 0x000, style: 0x000 }, { type: 0x000, style: 0x000 }, { type: 0x000, style: 0x000 }, { type: 0x000, style: 0x000 }, { type: 0x000, style: 0x000 }, { type: 0x000, style: 0x000 }, { type: 0x000, style: 0x000 }, { type: 0x000, style: 0x000 }, { type: 0x000, style: 0x000 }, { type: 0x000, style: 0x000 }],
     [{ type: 0x000, style: 0x000 }, { type: 0x000, style: 0x000 }, { type: 0x000, style: 0x000 }, { type: 0x000, style: 0x000 }, { type: 0x000, style: 0x000 }, { type: 0x000, style: 0x000 }, { type: 0x000, style: 0x000 }, { type: 0x000, style: 0x000 }, { type: 0x000, style: 0x000 }, { type: 0x000, style: 0x000 }, { type: 0x000, style: 0x000 }, { type: 0x000, style: 0x000 }],
   ],
-  dimension: { row: 12, column: 12 }
+  dimension: { row: 12, column: 12 },
+  enemy: [
+    { type: 0x000, from: { row: 2, column: 8 }, to: { row: 3, column: 2 }, path: [], delay: [{ duration: 240, type: 0x000 }] }
+  ]
 }
 
-const App = () => {
+const useAmbientLight = () => {
+  const context = React.useContext()
+
+  const ambientLight = React.useMemo(() => new THREE.AmbientLight(0xffffff, 0.02), [])
+
+  ReactPlugin.useObject({ target: context.scene, object: ambientLight })
+}
+
+const useOrbitControls = () => {
   const context = React.useContext()
 
   const render = React.useRender()
-  
-  const animationCount = ReactPlugin.useAnimationCount({ default: 0 })
 
-  const [font, setFont] = React.useState(Object())
-  const [model, setModel] = React.useState(Object())
-
-  const ambientLight = React.useMemo(() => new THREE.AmbientLight(0xffffff, 0.02), [])
   const orbitControls = React.useMemo(() => new OrbitControls(context.camera, context.renderer.domElement), [context.camera, context.renderer.domElement])
-
-  React.useEffectImmediate(() => {
-    context.camera.position.set(0, 0, 32)
-    context.camera.lookAt(new THREE.Vector3(0, 0, 0))
-  }, [])
 
   React.useEffectImmediate(() => {
     orbitControls.autoRotate = true
@@ -55,29 +54,69 @@ const App = () => {
     orbitControls.minPolarAngle = Math.PI * 0.25
     orbitControls.maxPolarAngle = Math.PI * 0.25
     orbitControls.addEventListener('change', render)
-    return () => orbitControls.dispose()
+    return () => {
+      orbitControls.removeEventListener('change', render)
+      orbitControls.dispose()
+    }
   }, [orbitControls])
 
   React.useEffectImmediate(() => orbitControls.update())
 
-  React.useEffectImmediate(() => {
-    const loader = new FontLoader()
-    loader.load(`data:text/plain;base64,${btoa(unescape(encodeURIComponent(JSON.stringify(helvetiker_regular))))}`, value => setFont({ ...font, helvetiker_regular: value }))
-  }, [])
-
-  React.useEffectImmediate(() => {
-    const loader = new GLTFLoader()
-    loader.load(xbot, value => setModel({ ...font, xbot: value }))
-  }, [])
-
   React.useEffectImmediate(() => render())
+}
 
-  React.contextProvider({ ...context, font: font, model: model, json: json, animationCount: animationCount })
+const useCamera = () => {
+  const context = React.useContext()
 
-  ReactPlugin.useObject({ target: context.scene, object: ambientLight })
+  React.useEffectImmediate(() => {
+    context.camera.position.set(0, 0, Math.max(25000 / context.renderer.domElement.width, 25000 / context.renderer.domElement.height))
+    context.camera.lookAt(new THREE.Vector3(0, 0, 0))
+  }, [])
+}
 
-  Map()
-  Text()
+const useLoadFont = () => {
+  const context = React.useContext()
+
+  const font = ReactPlugin.useFont([{ json: helvetiker_regular, name: 'helvetiker_regular' }])[0]
+
+  React.contextProvider({ ...context, font })
+}
+
+const useLoadModel = () => {
+  const context = React.useContext()
+
+  const model = ReactPlugin.useModel([{ link: xbot, name: 'xbot', type: 'gltf' }])[0]
+
+  React.contextProvider({ ...context, model })
+}
+
+const useAnimationRecord = () => {
+  const context = React.useContext()
+
+  const [animationCount, setAnimationCount] = React.useState(0)
+  const [animationSpeed, setAnimationSpeed] = React.useState(4)
+
+  React.useEffectImmediate(() => setAnimationCount(animationCount + animationSpeed))
+
+  React.contextProvider({ ...context, animationCount, setAnimationCount, animationSpeed, setAnimationSpeed })
+}
+
+const useEmemy = () => {
+  const context = React.useContext()
+
+  const enemy = React.useState(JSON.parse(JSON.stringify(map.enemy)))
+
+  React.contextProvider({ ...context, enemy })
+}
+
+const App = () => {
+  const context = React.useContext()
+
+  React.contextProvider({ ...context, map })
+
+  new Array(useAmbientLight, useOrbitControls, useCamera, useLoadFont, useLoadModel, useAnimationRecord, useEmemy).forEach(i => i())
+
+  new Array(Text, Building, Enemy).forEach(i => i())
 }
 
 export default React.component(App)

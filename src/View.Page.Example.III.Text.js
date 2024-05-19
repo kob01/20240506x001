@@ -7,13 +7,13 @@ import ReactPlugin from './utils.react.plugin'
 const App = () => {
   const context = React.useContext()
 
-  const [animationCount, clearAnimationCount] = ReactPlugin.useAnimationCount({ default: 0 })
+  const [animationCount, setAnimationCount] = ReactPlugin.useAnimationCount(0)
 
   const Object0x001 = React.useMemo(() => {
     const group = new THREE.Group()
 
     group.position.x = 0
-    group.position.y = 8
+    group.position.y = 0
     group.position.z = 0
 
     return group
@@ -32,8 +32,6 @@ const App = () => {
     ]
     const meth = new THREE.Mesh(geometry, material)
 
-    console.log(meth)
-
     geometry.computeBoundingBox()
 
     meth.position.x = (geometry.boundingBox.max.x - geometry.boundingBox.min.x) * -1 * 0.5
@@ -46,7 +44,7 @@ const App = () => {
   const Object0x003 = React.useMemo(() => {
     const pointLight = new THREE.PointLight(0xffffff, 1)
 
-    pointLight.decay = 1
+    pointLight.decay = 4
     pointLight.position.x = 0
     pointLight.position.y = 0
     pointLight.position.z = 0
@@ -55,11 +53,26 @@ const App = () => {
   }, [])
 
   React.useEffectImmediate(() => {
-    if (Object0x001 === undefined || Object0x002 === undefined) return clearAnimationCount()
+    if (Object0x001 === undefined || Object0x002 === undefined) {
+      Object0x001.visible = false
+    }
+    if (Object0x001 !== undefined && Object0x002 !== undefined) {
+      Object0x001.visible = true
+    }
+  }, [Object0x001, Object0x002])
 
-    Object0x001.position.y = Math.max(10 - 2 / 60 * animationCount, 8)
-    Object0x002.material.forEach(i => i.opacity = Math.min(1 / 60 * animationCount, 1))
-  })
+  React.useEffectImmediate(() => {
+    if (Object0x001 === undefined || Object0x002 === undefined) {
+      setAnimationCount(0)
+    }
+  }, [Object0x001, Object0x002])
+
+  React.useEffectImmediate(() => {
+    if (Object0x001 !== undefined && Object0x002 !== undefined && animationCount > 60 === false) {
+      Object0x001.position.y = 12 - 4 / 60 * animationCount
+      Object0x002.material.forEach(i => i.opacity = 1 / 60 * animationCount)
+    }
+  }, [Object0x001, Object0x002, animationCount])
 
   ReactPlugin.useObject({ target: Object0x001, object: Object0x002 })
   ReactPlugin.useObject({ target: Object0x001, object: Object0x003 })

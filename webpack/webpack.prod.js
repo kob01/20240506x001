@@ -7,10 +7,6 @@ const CopyWebpackPlugin = require("copy-webpack-plugin")
 
 const config = Object.assign({}, common, {
   mode: 'production',
-  output: {
-    filename: 'index.js',
-    path: path.resolve(__dirname, '../build')
-  },
   plugins: [
     new CleanWebpackPlugin({
       currentAssets: []
