@@ -3,8 +3,6 @@ import * as THREE from 'three'
 import React from './utils.react'
 import ReactPlugin from './utils.react.plugin'
 
-import { random } from './utils.common'
-
 const Type0o000 = (props) => {
   const ObjectBox = React.useMemo(() => {
     const geometry = new THREE.BoxGeometry(2, 2, 2)
@@ -224,9 +222,6 @@ const Type0o003 = (props) => {
 }
 
 const App = (props) => {
-  const animationProcess = React.useRef(-1)
-  const animationRandom = React.useRef(random(1, 0, 2))
-
   const ObjectGroup = React.useMemo(() => {
     const group = new THREE.Group()
 
@@ -234,19 +229,8 @@ const App = (props) => {
     group.position.y = 0
     group.position.z = 0
 
-
     return group
   }, [])
-
-  React.useEffectImmediate(() => {
-    if (animationProcess.current < 120) {
-      animationProcess.current = animationProcess.current + 1
-    }
-  })
-
-  React.useEffectImmediate(() => {
-    ObjectGroup.position.y = animationRandom.current * -8 - animationProcess.current / 120 * animationRandom.current * -8
-  })
 
   if (props.cell.type === 0o000) React.component(Type0o000)({ ...props, target: ObjectGroup })
   if (props.cell.type === 0o001) React.component(Type0o001)({ ...props, target: ObjectGroup })

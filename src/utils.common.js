@@ -10,4 +10,11 @@ const materials = (object) => {
   return r
 }
 
-export { random, materials }
+function customCurve(t, duration = 1) {  
+  let scaledTime = Math.min(t / duration, 1) * Math.PI / 2;  
+  let transformedTime = Math.pow(scaledTime, 2) / (2 * Math.PI / 4);  
+  let value = Math.sin(transformedTime)
+  return (value + 1) / 2;  
+}  
+
+export { random, materials, customCurve }

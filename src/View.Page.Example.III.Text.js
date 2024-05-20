@@ -9,8 +9,8 @@ import { materials } from './utils.common'
 const App = () => {
   const context = React.useContext()
 
-  const animationProcess = React.useRef(0)
-  const animationFlow = React.useRef(0)
+  const [animationProcess, setAnimationProcess] = React.useState(0)
+  const [animationFlow, setAnimationFlow] = React.useState(0)
 
   const ObjectGroup = React.useMemo(() => {
     const group = new THREE.Group()
@@ -28,9 +28,10 @@ const App = () => {
       { font: context.font.helvetiker_regular, size: 1, depth: 0.2, curveSegments: 12, bevelThickness: 20, bevelSize: 8, bevelEnabled: false }
     )
     const material = [
-      new THREE.MeshStandardMaterial({ color: 0xffffff, transparent: true, opacity: 1 }),
-      new THREE.MeshStandardMaterial({ color: 0xffffff, transparent: true, opacity: 1 }),
+      new THREE.MeshStandardMaterial({ color: 0xffffff }),
+      new THREE.MeshStandardMaterial({ color: 0xffffff }),
     ]
+
     const meth = new THREE.Mesh(geometry, material)
 
     geometry.computeBoundingBox()
@@ -53,30 +54,24 @@ const App = () => {
     return pointLight
   }, [])
 
-  React.useEffectImmediate(() => {
-    if (animationFlow.current === 0 && animationProcess.current < 60) {
-      animationProcess.current = animationProcess.current + 1
-    }
-    if (animationFlow.current === 1 && animationProcess.current > 0) {
-      animationProcess.current = animationProcess.current - 1
-    }
-  })
-
-  React.useEffectImmediate(() => {
-    materials(ObjectGroup).forEach(i => i.opacity = animationProcess.current / 60 * 1)
-  }, [animationProcess.current])
-
-  const event = React.useMemo(() => {
-    const s = () => animationFlow.current = 1
-    const e = () => animationFlow.current = 0
-    return { onMousedown: s, onMouseup: e, onTouchstart: s, onTouchend: e }
-  }, [])
-
-  ReactPlugin.useEvent({ ...context, ...event })
+  ReactPlugin.useEvent({ ...context, onMousedown: () => setAnimationFlow(1), onMouseup: () => setAnimationFlow(0), onTouchstart: () => setAnimationFlow(1), onTouchend: () => setAnimationFlow(0) })
 
   ReactPlugin.useObject({ target: ObjectGroup, object: ObjectText })
   ReactPlugin.useObject({ target: ObjectGroup, object: ObjectLight })
   ReactPlugin.useObject({ target: context.scene, object: ObjectGroup })
+
+  React.useEffectImmediate(() => {
+    if (animationFlow === 0 && animationProcess < 60) {
+      setAnimationProcess(animationProcess + 1)
+    }
+    if (animationFlow === 1 && animationProcess > 0) {
+      setAnimationProcess(animationProcess - 1)
+    }
+  })
+
+  React.useEffectImmediate(() => {
+    materials(ObjectGroup).forEach(i => { i.transparent = true; i.opacity = animationProcess / 60 * 1 })
+  }, [animationProcess])
 }
 
 export default React.component(App)
