@@ -4,13 +4,15 @@ import { TextGeometry } from 'three/addons/geometries/TextGeometry.js'
 import React from './utils.react'
 import ReactPlugin from './utils.react.plugin'
 
+import { materials } from './utils.common'
+
 const App = () => {
   const context = React.useContext()
 
-  const [animationProcess, setAnimationProcess] = React.useState(0)
-  const [animationFlow, setAnimationFlow] = React.useState(0)
+  const animationProcess = React.useRef(0)
+  const animationFlow = React.useRef(0)
 
-  const Object0o0001 = React.useMemo(() => {
+  const ObjectGroup = React.useMemo(() => {
     const group = new THREE.Group()
 
     group.position.x = 0
@@ -20,9 +22,7 @@ const App = () => {
     return group
   }, [])
 
-  const Object0o0002 = React.useMemo(() => {
-    if (context.font.helvetiker_regular === undefined) return
-
+  const ObjectText = React.useMemo(() => {
     const geometry = new TextGeometry(
       'Arknights',
       { font: context.font.helvetiker_regular, size: 1, depth: 0.2, curveSegments: 12, bevelThickness: 20, bevelSize: 8, bevelEnabled: false }
@@ -40,9 +40,9 @@ const App = () => {
     meth.position.z = 0
 
     return meth
-  }, [context.font.helvetiker_regular])
+  }, [])
 
-  const Object0o0003 = React.useMemo(() => {
+  const ObjectLight = React.useMemo(() => {
     const pointLight = new THREE.PointLight(0xffffff, 1)
 
     pointLight.decay = 4
@@ -54,40 +54,29 @@ const App = () => {
   }, [])
 
   React.useEffectImmediate(() => {
-    if (Object0o0001 === undefined || Object0o0002 === undefined) {
-      Object0o0001.visible = false
+    if (animationFlow.current === 0 && animationProcess.current < 60) {
+      animationProcess.current = animationProcess.current + 1
     }
-    if (Object0o0001 !== undefined && Object0o0002 !== undefined) {
-      Object0o0001.visible = true
-    }
-  }, [Object0o0001, Object0o0002])
-
-  React.useEffectImmediate(() => {
-    if (Object0o0001 !== undefined && Object0o0002 !== undefined) {
-      Object0o0002.material.forEach(i => i.opacity = animationProcess / 60 * 1)
-    }
-  }, [Object0o0001, Object0o0002, animationProcess])
-
-  React.useEffectImmediate(() => {
-    if (Object0o0001 !== undefined && Object0o0002 !== undefined && animationFlow === 0 && animationProcess < 60) {
-      setAnimationProcess(animationProcess + 1)
-    }
-    if (Object0o0001 !== undefined && Object0o0002 !== undefined && animationFlow === 1 && animationProcess > 0) {
-      setAnimationProcess(animationProcess - 1)
+    if (animationFlow.current === 1 && animationProcess.current > 0) {
+      animationProcess.current = animationProcess.current - 1
     }
   })
 
+  React.useEffectImmediate(() => {
+    materials(ObjectGroup).forEach(i => i.opacity = animationProcess.current / 60 * 1)
+  }, [animationProcess.current])
+
   const event = React.useMemo(() => {
-    const s = () => setAnimationFlow(1)
-    const e = () => setAnimationFlow(0)
+    const s = () => animationFlow.current = 1
+    const e = () => animationFlow.current = 0
     return { onMousedown: s, onMouseup: e, onTouchstart: s, onTouchend: e }
   }, [])
 
   ReactPlugin.useEvent({ ...context, ...event })
 
-  ReactPlugin.useObject({ target: Object0o0001, object: Object0o0002 })
-  ReactPlugin.useObject({ target: Object0o0001, object: Object0o0003 })
-  ReactPlugin.useObject({ target: context.scene, object: Object0o0001 })
+  ReactPlugin.useObject({ target: ObjectGroup, object: ObjectText })
+  ReactPlugin.useObject({ target: ObjectGroup, object: ObjectLight })
+  ReactPlugin.useObject({ target: context.scene, object: ObjectGroup })
 }
 
 export default React.component(App)

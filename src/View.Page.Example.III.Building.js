@@ -8,7 +8,7 @@ import Building from './View.Page.Example.III.Building.Component'
 const App = () => {
   const context = React.useContext()
 
-  const Object0x000 = React.useMemo(() => {
+  const ObjectGroup = React.useMemo(() => {
     const group = new THREE.Group()
 
     group.position.x = 0
@@ -23,16 +23,19 @@ const App = () => {
       {
         building: building,
         dimension: dimension,
+        row: row,
+        column: column,
         cell: building[row][column],
-        position: { row: row, column: column },
-        target: Object0x000,
+        x: (column - (dimension.column - 1) / 2) * 2,
+        y: (row - (dimension.row - 1) / 2) * 2,
+        target: ObjectGroup,
       }
     )
   }
 
   new Array(context.map.dimension.row).fill().forEach((i, row) => new Array(context.map.dimension.column).fill().forEach((i, column) => build(context.map.building, context.map.dimension, row, column)))
 
-  ReactPlugin.useObject({ target: context.scene, object: Object0x000 })
+  ReactPlugin.useObject({ target: context.scene, object: ObjectGroup })
 }
 
 export default React.component(App)

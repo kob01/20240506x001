@@ -89,14 +89,21 @@ const useFont = (props) => {
   const [font, setFont] = React.useState(Object())
 
   React.useEffectImmediate(() => {
-    props.forEach(i => {
+    const deal = (i, r) => {
       if (i.json) {
-        fontLoader.load(`data:text/plain;base64,${btoa(unescape(encodeURIComponent(JSON.stringify(i.json))))}`, value => setFont({ ...font, [i.name]: value }))
+        fontLoader.load(`data:text/plain;base64,${btoa(unescape(encodeURIComponent(JSON.stringify(i.json))))}`, value => r({ name: i.name, value: value }))
       }
       if (i.link) {
-        fontLoader.load(i.link, value => setFont({ ...font, [i.name]: value }))
+        fontLoader.load(i.link, value => r({ name: i.name, value: value }))
       }
-    })
+    }
+
+    const then = r => {
+      setFont(r.reduce((t, i) => Object.assign(t, { [i.name]: i.value }), Object()))
+      if (props.callback) props.callback()
+    }
+
+    Promise.all(props.font.map(i => new Promise(r => deal(i, r)))).then(then)
   }, [])
 
   return [font, setFont]
@@ -106,9 +113,21 @@ const useModel = (props) => {
   const [model, setModel] = React.useState(Object())
 
   React.useEffectImmediate(() => {
-    props.forEach(i => {
-      if (i.type === 'gltf') gltfLoader.load(i.link, value => setModel({ ...model, [i.name]: value }))
-    })
+    const deal = (i, r) => {
+      if (i.model) {
+        r({ name: i.name, value: i.model })
+      }
+      if (i.link && i.type === 'gltf') {
+        gltfLoader.load(i.link, value => r({ name: i.name, value: value }))
+      }
+    }
+
+    const then = r => {
+      setModel(r.reduce((t, i) => Object.assign(t, { [i.name]: i.value }), Object()))
+      if (props.callback) props.callback()
+    }
+
+    Promise.all(props.model.map(i => new Promise(r => deal(i, r)))).then(then)
   }, [])
 
   return [model, setModel]
